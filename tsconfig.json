@@ -8,5 +8,11 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "**/*.config.mts",
+    "**/*.config.ts",
+    "eslint.config.mts"
+  ]
 }

@@ -4,8 +4,8 @@ import { Server } from "socket.io"
 import { GameSocket } from ".sockets/GameSocket"
 import routes from ./routes
 
-const app = express()
-const httpServer = createServer(app)
+  const app = express();
+const httpServer = createServer(app);
 const io = new Server(httpServer)
 
 const PORT = 3000
