@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Turn-Based Game Test</title>
+</head>
+<body>
+  <h1>Simple Game UI</h1>
+  <button id="attack">Attack</button>
+  <div id="log"></div>
+
+  <!-- Socket.IO client script -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io("http://localhost:3000"); // adjust if needed
+
+    // Send action
+    document.getElementById("attack").addEventListener("click", () => {
+      socket.emit("playerMove", { action: "attack" });
+    });
+
+    // Listen for updates
+    socket.on("gameUpdate", (state) => {
+      document.getElementById("log").innerText = 
+        `It's now ${state.currentPlayer}'s turn. Last move: ${state.lastMove}`;
+    });
+
+    // Optional: listen for connection events
+    socket.on("connect", () => {
+      console.log("Connected to game server!");
+    });
+  </script>
+</body>
+</html>
