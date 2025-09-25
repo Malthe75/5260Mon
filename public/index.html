@@ -1,33 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Turn-Based Game Test</title>
-</head>
-<body>
-  <h1>Simple Game UI</h1>
-  <button id="attack">Attack</button>
-  <div id="log"></div>
+  <head>
+    <title>Turn-Based Game Test</title>
+  </head>
 
-  <!-- Socket.IO client script -->
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io("http://localhost:3000"); // adjust if needed
+  <body>
+    <h1>Simple Game UI</h1>
+    <ul id="player1Actions" style="background-color: lightblue">
+      <li><button id="player1">Attack</button></li>
+      <li><button id="player1S">Roast</button></li>
+      <li><button id="player1SS">Drink</button></li>
+      <li><button id="player1SSS">RUN</button></li>
+    </ul>
 
-    // Send action
-    document.getElementById("attack").addEventListener("click", () => {
-      socket.emit("playerMove", { action: "attack" });
-    });
+    <ul id="player2Actions" style="background-color: blue" hidden>
+      <li><button id="player2">Attack</button></li>
+      <li><button id="player2S">Roast</button></li>
+      <li><button id="player2SS">Drink</button></li>
+      <li><button id="player2SSS">Run away!!!</button></li>
+    </ul>
 
-    // Listen for updates
-    socket.on("gameUpdate", (state) => {
-      document.getElementById("log").innerText = 
-        `It's now ${state.currentPlayer}'s turn. Last move: ${state.lastMove}`;
-    });
+    <div id="log"></div>
 
-    // Optional: listen for connection events
-    socket.on("connect", () => {
-      console.log("Connected to game server!");
-    });
-  </script>
-</body>
+    <!-- Socket.IO client script -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io('http://localhost:3000') // adjust if needed
+
+      // Send action
+      document.getElementById('player1').addEventListener('click', () => {
+        document.getElementById('player1Actions').hidden = true
+        document.getElementById('player2Actions').hidden = false
+        socket.emit('player1Move', { action: 'attack' })
+      })
+      document.getElementById('player2').addEventListener('click', () => {
+        document.getElementById('player2Actions').hidden = true
+        document.getElementById('player1Actions').hidden = false
+        socket.emit('player2Move', { action: 'attack' })
+      })
+
+      // Listen for updates
+      socket.on('gameUpdate', (state) => {
+        document.getElementById('log').innerText =
+          `It's now ${state.currentPlayer}'s turn. Last move: ${state.lastMove}`
+      })
+
+      // Optional: listen for connection events
+      socket.on('connect', () => {
+        console.log('Connected to game server!')
+      })
+    </script>
+  </body>
 </html>
