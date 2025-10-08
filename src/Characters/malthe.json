@@ -1,0 +1,29 @@
+{
+    "id": "malthe",
+    "name": "Malthe",
+    "maxHealth": 100,
+    "images": {
+        "idle": "../assets/malthe_idle.png",
+        "walk": "../assets/malthe_walk.png",
+        "attack": "../assets/malthe_attack.png"
+    },
+    "attacks": [
+        {
+            "name": "Sword Slash",
+            "damage": 15,
+            "cooldown": 2
+        },
+        {
+            "name": "Shield Bash",
+            "damage": 10,
+            "cooldown": 3
+        }
+    ],
+
+    "lines": [
+        "Hello there! I'm Malthe, your friendly neighborhood adventurer.",
+        "I love exploring new places and meeting new people.",
+        "Do you want to join me on my next adventure?"
+    ]
+
+}
