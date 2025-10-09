@@ -1,21 +1,18 @@
 import express from 'express'
-import { createServer } from 'http'
+import http from 'http'
 import { Server } from 'socket.io'
+import path from 'path'
 import { GameSocket } from './sockets/GameSocket'
-import routes from './routes'
+import { CharacterRegistry } from './CharacterRegistry'
 
 const app = express()
-const httpServer = createServer(app)
-const io = new Server(httpServer)
+const server = http.createServer(app)
+const io = new Server(server, { cors: { origin: '*' } })
 
-app.use(express.static('public'))
+// Serve static frontend
+app.use(express.static(path.join(__dirname, '../public')))
 
-const PORT = 3000
+CharacterRegistry.init()
+new GameSocket(io)
 
-app.use('/', routes)
-// Socket.IO game logic
-new GameSocket(io) // handles all game socket events what?
-
-httpServer.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`)
-})
+server.listen(3000, () => console.log('Server running on http://localhost:3000'))

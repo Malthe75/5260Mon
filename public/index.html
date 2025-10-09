@@ -1,53 +1,100 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>Turn-Based Game Test</title>
+    <meta charset="UTF-8" />
+    <title>Battle Test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      .player {
+        margin-bottom: 10px;
+      }
+      button {
+        margin: 5px;
+      }
+    </style>
   </head>
-
   <body>
-    <h1>Simple Game UI</h1>
-    <ul id="player1Actions" style="background-color: lightblue">
-      <li><button id="player1">Attack</button></li>
-      <li><button id="player1S">Roast</button></li>
-      <li><button id="player1SS">Drink</button></li>
-      <li><button id="player1SSS">RUN</button></li>
-    </ul>
+    <h1>Battle Test</h1>
 
-    <ul id="player2Actions" style="background-color: blue" hidden>
-      <li><button id="player2">Attack</button></li>
-      <li><button id="player2S">Roast</button></li>
-      <li><button id="player2SS">Drink</button></li>
-      <li><button id="player2SSS">Run away!!!</button></li>
-    </ul>
+    <div id="character-selection">
+      <h2>Select your character</h2>
+      <div id="characters"></div>
+    </div>
 
-    <div id="log"></div>
+    <div id="battle" style="display: none">
+      <h2>Battle!</h2>
+      <div id="players"></div>
+      <div id="attacks"></div>
+      <p id="turn-info"></p>
+    </div>
 
-    <!-- Socket.IO client script -->
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
-      const socket = io('http://localhost:3000') // adjust if needed
+      const socket = io()
 
-      // Send action
-      document.getElementById('player1').addEventListener('click', () => {
-        document.getElementById('player1Actions').hidden = true
-        document.getElementById('player2Actions').hidden = false
-        socket.emit('player1Move', { action: 'attack' })
-      })
-      document.getElementById('player2').addEventListener('click', () => {
-        document.getElementById('player2Actions').hidden = true
-        document.getElementById('player1Actions').hidden = false
-        socket.emit('player2Move', { action: 'attack' })
+      const charactersDiv = document.getElementById('characters')
+      const battleDiv = document.getElementById('battle')
+      const playersDiv = document.getElementById('players')
+      const attacksDiv = document.getElementById('attacks')
+      const turnInfo = document.getElementById('turn-info')
+
+      let selectedCharacter = null
+      let playerId = null
+      let currentPlayerId = null
+      let characterData = {}
+
+      // Receive character list from server
+      socket.on('characterList', (chars) => {
+        charactersDiv.innerHTML = ''
+        chars.forEach((char) => {
+          const btn = document.createElement('button')
+          btn.innerText = char.displayName
+          btn.onclick = () => {
+            selectedCharacter = char
+            socket.emit('selectCharacter', char.id)
+          }
+          charactersDiv.appendChild(btn)
+          characterData[char.id] = char
+        })
       })
 
-      // Listen for updates
-      socket.on('gameUpdate', (state) => {
-        document.getElementById('log').innerText =
-          `It's now ${state.currentPlayer}'s turn. Last move: ${state.lastMove}`
+      // Character selected confirmation
+      socket.on('characterSelected', (charId) => {
+        document.getElementById('character-selection').style.display = 'none'
+        battleDiv.style.display = 'block'
+        playerId = socket.id
       })
 
-      // Optional: listen for connection events
-      socket.on('connect', () => {
-        console.log('Connected to game server!')
+      // Receive updated game state
+      socket.on('gameState', (state) => {
+        playersDiv.innerHTML = ''
+        attacksDiv.innerHTML = ''
+        state.forEach((p) => {
+          const div = document.createElement('div')
+          div.className = 'player'
+          div.innerText = `${p.name}: ${p.currentHealth} HP ${p.isAlive ? '' : '(KO)'}`
+          playersDiv.appendChild(div)
+        })
+
+        // Show attacks for the current player
+        currentPlayerId = state.find((p) => p.id === socket.id)?.id
+        const currentPlayer = state.find((p) => p.id === socket.id)
+        const attacker = state.find((p) => p.id === socket.id)
+        if (attacker && attacker.isAlive) {
+          const attacks = selectedCharacter.attacks || []
+          attacks.forEach((a) => {
+            const btn = document.createElement('button')
+            btn.innerText = `${a.name} (${a.damage})`
+            btn.onclick = () => {
+              socket.emit('attack', a.id)
+            }
+            attacksDiv.appendChild(btn)
+          })
+        }
+
+        turnInfo.innerText = `Current turn: ${state[state.findIndex((p) => p.id === currentPlayerId)].name}`
       })
     </script>
   </body>

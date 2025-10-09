@@ -3,18 +3,18 @@
     "name": "Malthe",
     "maxHealth": 100,
     "images": {
-        "idle": "../assets/malthe_idle.png",
-        "walk": "../assets/malthe_walk.png",
-        "attack": "../assets/malthe_attack.png"
+        "idle": "../assets/malt/idleSprite.png",
+        "walk": "../assets/malt/idleSprite.png",
+        "attack": "../assets/malt/idleSprite.png"
     },
     "attacks": [
         {
-            "name": "Sword Slash",
+            "name": "Slash",
             "damage": 15,
             "cooldown": 2
         },
         {
-            "name": "Shield Bash",
+            "name": "Hit",
             "damage": 10,
             "cooldown": 3
         }
